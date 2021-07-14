@@ -1,0 +1,57 @@
+
+spring:
+  application:
+    name: quartz
+  datasource:
+    url: jdbc:mysql://192.168.31.234:3306/quartz?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: true
+      connection-timeout: 20000
+      minimum-idle: 5
+      maximum-pool-size: 12
+      idle-timeout: 30000
+      max-lifetime: 1200000
+  quartz:
+    auto-startup: true
+    startup-delay: 2s
+    overwrite-existing-jobs: true
+    job-store-type: jdbc
+    scheduler-name: godfunc-schedule
+    jdbc:
+      initialize-schema: never
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: GodfuncQuartz
+            instanceId: AUTO
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 20
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            isClustered: true
+            clusterCheckinInterval: 15000
+            maxMisfiresToHandleAtATime: 1
+            txIsolationLevelSerializable: true
+            misfireThreshold: 12000
+            tablePrefix: QRTZ_
+            useProperties: false
+
+mybatis-plus:
+  global-config:
+    banner: false
+    db-config:
+      id-type: ASSIGN_ID
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
