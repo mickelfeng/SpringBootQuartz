@@ -36,5 +36,5 @@ public abstract class AbstractJob implements Job {
 
     }
 
-    public abstract void doExecute(JobExecutionContext context, JobEntity job);
+    public abstract void doExecute(JobExecutionContext context, JobEntity job) throws Exception;
 }

@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class JobInvokeUtils {
 
-    public static Object invoke(JobEntity job) {
+    public static Object invoke(JobEntity job) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, ClassNotFoundException {
         // com.godfunc.task.TestTask#up(1L, "12")
         // testTask.up(2L, "12")
         String invoke = job.getInvoke();
@@ -23,24 +23,15 @@ public class JobInvokeUtils {
             String method = invoke.substring(classIndex + 1, methodIndex);
             String paramsStr = invoke.substring(methodIndex + 1, paramIndex);
             Class<?> clazz = null;
-            try {
-                clazz = Class.forName(clazzStr);
-                Object bean = clazz.newInstance();
-                if (StringUtils.isNotBlank(paramsStr)) {
-                    Map<Class, Object> params = getParams(paramsStr);
-                    try {
-                        Method invokMethod = bean.getClass().getDeclaredMethod(method, params.keySet().toArray(new Class[0]));
-                        return invokMethod.invoke(bean, params.values().toArray());
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
+            clazz = Class.forName(clazzStr);
+            Object bean = clazz.newInstance();
+            if (StringUtils.isNotBlank(paramsStr)) {
+                Map<Class, Object> params = getParams(paramsStr);
+                Method invokMethod = bean.getClass().getDeclaredMethod(method, params.keySet().toArray(new Class[0]));
+                return invokMethod.invoke(bean, params.values().toArray());
 
-                }
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
             }
+
         } else {
             String beanName = invoke.substring(0, invoke.indexOf("."));
             String method = invoke.substring(invoke.indexOf("."), invoke.indexOf("("));
@@ -59,7 +50,6 @@ public class JobInvokeUtils {
             return null;
         }
     }
-
 
 
     public static Map<Class, Object> getParams(String paramStr) {
@@ -81,13 +71,5 @@ public class JobInvokeUtils {
             }
         }
         return params;
-    }
-
-    public static void main(String[] args) {
-        String invoke = "com.godfunc.task.TestTask#up(1L, \"12\")";
-        JobEntity jobEntity = new JobEntity();
-        jobEntity.setInvoke(invoke);
-        Object invoke1 = invoke(jobEntity);
-        System.out.println(invoke1);
     }
 }
